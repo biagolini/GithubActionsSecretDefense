@@ -1,0 +1,24 @@
+# ATTACK 5 base pipeline (insecure on purpose). Holds the AWS role and injects
+# DEMO_SECRET into the job, then runs pytest with -rA so test output is shown
+# even for passing tests. A malicious test (tests/test_calculator.py.insecure)
+# uses this to leak both the role session and DEMO_SECRET without editing any
+# workflow, which is why a push ruleset on .github/ does not stop it. Rename to
+# remove .insecure to run it.
+name: insecure-ci
+on: push
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+      - run: pip install -r requirements.txt
+      - run: pytest -rA
+        env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}

